@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     2009/09/06 22:05:47                                                        
+
+     project   Hadoop Ruby 
+     description
+                   
+     fujibee                                                                
+     ====================================================================== -->
+<project name="build JRuby map reduce" default="jar">
+
+    <property environment="env" />
+    <property name="hadoop.home" value="${env.HADOOP_HOME}" />
+    
+	<property name="version" value="0.0.1" />
+	<property name="src.dir" value="${basedir}/src/java" />
+	<property name="build.dir" value="${basedir}/build" />
+	<property name="dist.dir" value="${basedir}/dist" />
+
+	<property name="hadoop.version" value="0.19.2" />
+	<property name="hadoop.jar" value="${hadoop.home}/hadoop-${hadoop.version}-core.jar" />
+
+	<target name="jar" depends="compile">
+		<mkdir dir="${dist.dir}" />
+		<jar jarfile="${dist.dir}/hadoop-ruby.jar" basedir="${build.dir}">
+			<manifest>
+				<section name="org/apache/hadoop/ruby">
+					<attribute name="Implementation-Title" value="Hadoop-Ruby" />
+					<attribute name="Implementation-Version" value="${version}" />
+					<attribute name="Implementation-Vendor" value="" />
+				</section>
+			</manifest>
+		</jar>
+	</target>
+
+    <target name="compile">
+        <echo message="${hadoop.jar}" />
+		<mkdir dir="${build.dir}" />
+        <javac srcdir="${src.dir}" destdir="${build.dir}" classpath="${hadoop.jar}" />
+    </target>
+
+</project>
