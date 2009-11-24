@@ -25,8 +25,8 @@ public class JRubyEvaluator {
 		Object result = null;
 		try {
 			rubyEngine.eval(new FileReader("init.rb"));
-			result = ((Invocable) rubyEngine).invokeFunction(methodName,
-					scriptName, key, value, output, reporter);
+			result = ((Invocable) rubyEngine).invokeFunction(methodName, key,
+					value, output, reporter, scriptName);
 		} catch (FileNotFoundException e) {
 			throw new ScriptException(e);
 		} catch (NoSuchMethodException e) {
