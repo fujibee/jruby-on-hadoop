@@ -19,7 +19,7 @@ public class JRubyJobRunner extends Configured implements Tool {
 	public int run(String[] args) throws Exception {
 		JobConf conf = new JobConf(getConf(), JRubyJobRunner.class);
 		conf.setJobName("ruby.runner");
-		
+
 		conf.set("mapred.ruby.script", args[0]);
 
 		conf.setOutputKeyClass(Text.class);
@@ -29,15 +29,26 @@ public class JRubyJobRunner extends Configured implements Tool {
 		conf.setCombinerClass(JRubyReducer.class);
 		conf.setReducerClass(JRubyReducer.class);
 
-		FileInputFormat.setInputPaths(conf, args[1]);
-		FileOutputFormat.setOutputPath(conf, new Path(args[2]));
+		if (args.length == 3) {
+			FileInputFormat.setInputPaths(conf, args[1]);
+			FileOutputFormat.setOutputPath(conf, new Path(args[2]));
+		}
+
+		// override by Ruby script
+		JRubyEvaluator evaluator = new JRubyEvaluator(conf);
+		Object[] paths = (Object[]) evaluator.invoke("setup", conf);
+		if (paths != null && paths.length == 2) {
+			FileInputFormat.setInputPaths(conf, (String) paths[0]);
+			FileOutputFormat.setOutputPath(conf, new Path((String) paths[1]));
+		}
 
 		JobClient.runJob(conf);
 		return 0;
 	}
 
 	public static void main(String[] args) throws Exception {
-		int res = ToolRunner.run(new Configuration(), new JRubyJobRunner(), args);
+		int res = ToolRunner.run(new Configuration(), new JRubyJobRunner(),
+				args);
 		System.exit(res);
 	}
 }

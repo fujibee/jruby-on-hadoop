@@ -1,7 +1,9 @@
 package org.apache.hadoop.ruby;
 
 import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
@@ -20,11 +22,25 @@ public class JRubyEvaluator {
 		scriptName = conf.get("mapred.ruby.script");
 	}
 
+	public Object invoke(String methodName, Object conf) throws ScriptException {
+		Object result = null;
+		try {
+			rubyEngine.eval(readRubyInitialFile());
+			result = ((Invocable) rubyEngine).invokeFunction(methodName, conf,
+					scriptName);
+		} catch (FileNotFoundException e) {
+			throw new ScriptException(e);
+		} catch (NoSuchMethodException e) {
+			throw new ScriptException(e);
+		}
+		return result;
+	}
+
 	public Object invoke(String methodName, Object key, Object value,
 			Object output, Object reporter) throws ScriptException {
 		Object result = null;
 		try {
-			rubyEngine.eval(new FileReader("init.rb"));
+			rubyEngine.eval(readRubyInitialFile());
 			result = ((Invocable) rubyEngine).invokeFunction(methodName, key,
 					value, output, reporter, scriptName);
 		} catch (FileNotFoundException e) {
@@ -33,5 +49,15 @@ public class JRubyEvaluator {
 			throw new ScriptException(e);
 		}
 		return result;
+	}
+
+	private Reader readRubyInitialFile() throws FileNotFoundException {
+		String initialFile = "init.rb"; // TODO externalize
+		InputStream is = Thread.currentThread().getContextClassLoader()
+				.getResourceAsStream(initialFile);
+		if (is == null) {
+			throw new FileNotFoundException(initialFile);
+		}
+		return new InputStreamReader(is);
 	}
 }
