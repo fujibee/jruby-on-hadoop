@@ -11,6 +11,7 @@ begin
     gemspec.add_dependency 'jruby-jars'
     gemspec.files.exclude "src/**/*"
   end
+  Jeweler::GemcutterTasks.new
 rescue LoadError
   puts "Jeweler not available. Install it with: gem install jeweler"
 end
