@@ -2,8 +2,9 @@ module JRubyOnHadoop
   JAVA_MAIN_CLASS = 'org.apache.hadoop.ruby.JRubyJobRunner' 
 
   class Client
-    def initialize(init_script='mapred.rb')
-      @init_script = init_script
+    def initialize(argv=[])
+      @init_script = argv[0] || 'mapred.rb'
+      @args = argv[1..argv.size-1].join(" ") if argv.size > 0
     end
 
     def run
@@ -12,7 +13,7 @@ module JRubyOnHadoop
 
     def cmd
       "hadoop jar #{main_jar_path} #{JAVA_MAIN_CLASS}" +
-      " -libjars #{jruby_jar_paths} -files #{@init_script}"
+      " -libjars #{jruby_jar_paths} -files #{@init_script} #{@args}"
     end
 
     def main_jar_path

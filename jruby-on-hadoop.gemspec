@@ -5,13 +5,15 @@
 
 Gem::Specification.new do |s|
   s.name = %q{jruby-on-hadoop}
-  s.version = "0.0.1"
+  s.version = "0.0.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Koichi Fujikawa"]
-  s.date = %q{2009-12-26}
+  s.date = %q{2009-12-28}
+  s.default_executable = %q{joh}
   s.description = %q{JRuby on Hadoop}
   s.email = %q{fujibee@gmail.com}
+  s.executables = ["joh"]
   s.extra_rdoc_files = [
     "README"
   ]
@@ -21,13 +23,19 @@ Gem::Specification.new do |s|
      "VERSION",
      "build.xml",
      "jruby-on-hadoop.gemspec",
-     "lib/hadoop-ruby.jar"
+     "lib/hadoop-ruby.jar",
+     "lib/jruby-on-hadoop.rb",
+     "lib/jruby-on-hadoop/client.rb",
+     "spec/jruby-on-hadoop_spec.rb"
   ]
   s.homepage = %q{http://github.com/fujibee/jruby-on-hadoop}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.5}
   s.summary = %q{JRuby on Hadoop}
+  s.test_files = [
+    "spec/jruby-on-hadoop_spec.rb"
+  ]
 
   if s.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
