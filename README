@@ -1,27 +1,37 @@
-= hadoop-ruby
+= JRuby on Hadoop
+
+! now this module is reconstructing.. Please wait after year 2010. !
+
+JRuby on Hadoop is a thin wrapper for Hadoop Mapper / Reducer by JRuby.
+
+== Install
+
+1. Upgrade your rubygem to 1.3.5
+2. "gem install jruby-on-hadoop"
 
 == Description
-HadoopのMapper/ReducerをRubyで記述することができます。
-hadoop-rubydslのためのJRubyラッパーです。
 
-例）
-init.rb
+You can run 'joh' like below:
+$ joh mapred.rb inputs outpus
+
+Example.
+
+mapred.rb
 
 def map(script, key, value, output, reporter)
-  # map処理
+  # mapper process
 end
 
 def reduce(script, key, values, output, reporter)
-  # reduce処理
+  # reducer process
 end
 
 == Build
 
 ant
 
-を実行します。
-環境変数HADOOP_HOMEを設定する必要があります。
-想定しているHadoopのバージョンは0.19.2です。
+Required to set env HADOOP_HOME for your system.
+Assumed Hadoop version is 0.19.2.
 
 == Author
 Koichi Fujikawa <fujibee@gmail.com>

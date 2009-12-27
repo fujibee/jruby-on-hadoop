@@ -12,7 +12,10 @@ module JRubyOnHadoop
     end
 
     def cmd
-      "hadoop jar #{main_jar_path} #{JAVA_MAIN_CLASS}" +
+      hadoop_home = ENV['HADOOP_HOME']
+      raise 'HADOOP_HOME is not set' unless hadoop_home 
+      hadoop_cmd = "#{hadoop_home}/bin/hadoop"
+      "#{hadoop_cmd} jar #{main_jar_path} #{JAVA_MAIN_CLASS}" +
       " -libjars #{jruby_jar_paths} -files #{@init_script} #{@args}"
     end
 
