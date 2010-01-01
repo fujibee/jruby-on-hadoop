@@ -6,21 +6,33 @@ describe JRubyOnHadoop do
     jar_path = File.join(File.expand_path(jar_dir), 'hadoop-ruby.jar')
     JRubyOnHadoop.jar_path.should == jar_path
   end
+
+  it 'should return wrapper ruby file' do
+    dir = File.join(File.dirname(__FILE__), '..', 'lib')
+    path = File.join(File.expand_path(dir), '_wrapper.rb')
+    JRubyOnHadoop.wrapper_ruby_file.should == path
+  end
 end
 
 describe JRubyOnHadoop::Client do
+  before do
+    @client = JRubyOnHadoop::Client.new
+  end
+
   it 'gather necessary jar paths' do
     version_pattern = '[\d\.]*'
-    client = JRubyOnHadoop::Client.new
-    client.main_jar_path.should include 'hadoop-ruby.jar'
+    @client.main_jar_path.should include 'hadoop-ruby.jar'
 
-    client.jruby_jar_paths.should match /jruby\-core\-#{version_pattern}\.jar/
-    client.jruby_jar_paths.should match /jruby\-stdlib\-#{version_pattern}\.jar/
+    @client.opt_libjars.should match /jruby\-core\-#{version_pattern}\.jar/
+    @client.opt_libjars.should match /jruby\-stdlib\-#{version_pattern}\.jar/
+  end
+
+  it 'gather necessary ruby files' do
+    @client.opt_files.should match /mapred.rb/
   end
 
   it 'construct command for running hadoop' do
     path_pattern = '[\w/\-\.,]*'
-    client = JRubyOnHadoop::Client.new
-    client.cmd.should match /hadoop jar #{path_pattern}hadoop-ruby.jar org.apache.hadoop.ruby.JRubyJobRunner -libjars #{path_pattern}.jar -files mapred.rb/
+    @client.cmd.should match /hadoop jar #{path_pattern}hadoop-ruby.jar org.apache.hadoop.ruby.JRubyJobRunner -libjars #{path_pattern}.jar -files mapred.rb/
   end
 end

@@ -14,20 +14,28 @@ import org.apache.hadoop.mapred.JobConf;
 
 public class JRubyEvaluator {
 
+	private static final String WRAPPER_FILE_NAME = "ruby_wrapper.rb";
+
 	private ScriptEngine rubyEngine;
-	private String scriptName;
+
+	/** ruby script name kicked by Java at first */
+	private String scriptFileName;
+
+	/** hadoop ruby dsl file using in Hadoop mapper/reducer */
+	private String dslFileName;
 
 	public JRubyEvaluator(JobConf conf) {
 		rubyEngine = new ScriptEngineManager().getEngineByName("jruby");
-		scriptName = conf.get("mapred.ruby.script");
+		scriptFileName = conf.get("mapred.ruby.script");
+		dslFileName = conf.get("mapred.ruby.dslfile");
 	}
 
 	public Object invoke(String methodName, Object conf) throws ScriptException {
 		Object result = null;
 		try {
-			rubyEngine.eval(readRubyInitialFile());
+			rubyEngine.eval(readRubyWrapperFile());
 			result = ((Invocable) rubyEngine).invokeFunction(methodName, conf,
-					scriptName);
+					scriptFileName, dslFileName);
 		} catch (FileNotFoundException e) {
 			throw new ScriptException(e);
 		} catch (NoSuchMethodException e) {
@@ -40,9 +48,9 @@ public class JRubyEvaluator {
 			Object output, Object reporter) throws ScriptException {
 		Object result = null;
 		try {
-			rubyEngine.eval(readRubyInitialFile());
+			rubyEngine.eval(readRubyWrapperFile());
 			result = ((Invocable) rubyEngine).invokeFunction(methodName, key,
-					value, output, reporter, scriptName);
+					value, output, reporter, scriptFileName, dslFileName);
 		} catch (FileNotFoundException e) {
 			throw new ScriptException(e);
 		} catch (NoSuchMethodException e) {
@@ -51,12 +59,11 @@ public class JRubyEvaluator {
 		return result;
 	}
 
-	private Reader readRubyInitialFile() throws FileNotFoundException {
-		String initialFile = "init.rb"; // TODO externalize
+	private Reader readRubyWrapperFile() throws FileNotFoundException {
 		InputStream is = Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream(initialFile);
+				.getResourceAsStream(WRAPPER_FILE_NAME);
 		if (is == null) {
-			throw new FileNotFoundException(initialFile);
+			throw new FileNotFoundException(WRAPPER_FILE_NAME);
 		}
 		return new InputStreamReader(is);
 	}

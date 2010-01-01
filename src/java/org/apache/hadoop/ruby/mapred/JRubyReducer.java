@@ -21,7 +21,7 @@ public class JRubyReducer extends JRubyMapRed implements
 		// invoke "reduce" method in ruby
 		JRubyEvaluator evaluator = getJRubyEvaluator();
 		try {
-			evaluator.invoke("reduce", key, values, output, reporter);
+			evaluator.invoke("wrap_reduce", key, values, output, reporter);
 		} catch (ScriptException e) {
 			reporter.setStatus(e.getMessage());
 		}

@@ -21,7 +21,7 @@ public class JRubyMapper extends JRubyMapRed implements
 		// invoke "map" method in ruby
 		JRubyEvaluator evaluator = getJRubyEvaluator();
 		try {
-			evaluator.invoke("map", key, value, output, reporter);
+			evaluator.invoke("wrap_map", key, value, output, reporter);
 		} catch (ScriptException e) {
 			reporter.setStatus(e.getMessage());
 		}
