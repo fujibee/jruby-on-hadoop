@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Koichi Fujikawa"]
-  s.date = %q{2009-12-28}
+  s.date = %q{2010-01-02}
   s.default_executable = %q{joh}
   s.description = %q{JRuby on Hadoop}
   s.email = %q{fujibee@gmail.com}
@@ -21,12 +21,19 @@ Gem::Specification.new do |s|
     "README",
      "Rakefile",
      "VERSION",
+     "bin/joh",
      "build.xml",
+     "examples/mapred.rb",
      "jruby-on-hadoop.gemspec",
      "lib/hadoop-ruby.jar",
      "lib/jruby-on-hadoop.rb",
      "lib/jruby-on-hadoop/client.rb",
-     "spec/jruby-on-hadoop_spec.rb"
+     "lib/ruby_wrapper.rb",
+     "spec/jruby-on-hadoop_spec.rb",
+     "spec/ruby_wrapper_spec.rb",
+     "test/java/org/apache/hadoop/ruby/JRubyJobRunnerTest.java",
+     "test/java/org/apache/hadoop/ruby/mapred/JRubyMapperTest.java",
+     "test/java/org/apache/hadoop/ruby/mapred/JRubyReducerTest.java"
   ]
   s.homepage = %q{http://github.com/fujibee/jruby-on-hadoop}
   s.rdoc_options = ["--charset=UTF-8"]
@@ -34,7 +41,9 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.5}
   s.summary = %q{JRuby on Hadoop}
   s.test_files = [
-    "spec/jruby-on-hadoop_spec.rb"
+    "spec/jruby-on-hadoop_spec.rb",
+     "spec/ruby_wrapper_spec.rb",
+     "examples/mapred.rb"
   ]
 
   if s.respond_to? :specification_version then

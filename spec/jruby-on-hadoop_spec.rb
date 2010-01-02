@@ -7,9 +7,14 @@ describe JRubyOnHadoop do
     JRubyOnHadoop.jar_path.should == jar_path
   end
 
+  it 'should return lib path' do
+    lib_dir = File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
+    JRubyOnHadoop.lib_path.should == lib_dir
+  end
+
   it 'should return wrapper ruby file' do
     dir = File.join(File.dirname(__FILE__), '..', 'lib')
-    path = File.join(File.expand_path(dir), '_wrapper.rb')
+    path = File.join(File.expand_path(dir), 'ruby_wrapper.rb')
     JRubyOnHadoop.wrapper_ruby_file.should == path
   end
 end
@@ -34,5 +39,10 @@ describe JRubyOnHadoop::Client do
   it 'construct command for running hadoop' do
     path_pattern = '[\w/\-\.,]*'
     @client.cmd.should match /hadoop jar #{path_pattern}hadoop-ruby.jar org.apache.hadoop.ruby.JRubyJobRunner -libjars #{path_pattern}.jar -files mapred.rb/
+  end
+
+  it 'can get mapred args' do
+    client = JRubyOnHadoop::Client.new(["mapred.rb", "inputs", "outputs"])
+    client.mapred_args.should == "--script mapred.rb inputs outputs"
   end
 end
