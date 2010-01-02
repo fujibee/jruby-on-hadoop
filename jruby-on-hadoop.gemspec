@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{jruby-on-hadoop}
-  s.version = "0.0.2"
+  s.version = "0.0.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Koichi Fujikawa"]
@@ -15,15 +15,15 @@ Gem::Specification.new do |s|
   s.email = %q{fujibee@gmail.com}
   s.executables = ["joh"]
   s.extra_rdoc_files = [
-    "README"
+    "README.rdoc"
   ]
   s.files = [
-    "README",
+    "README.rdoc",
      "Rakefile",
      "VERSION",
      "bin/joh",
      "build.xml",
-     "examples/mapred.rb",
+     "examples/wordcount.rb",
      "jruby-on-hadoop.gemspec",
      "lib/hadoop-ruby.jar",
      "lib/jruby-on-hadoop.rb",
@@ -43,7 +43,7 @@ Gem::Specification.new do |s|
   s.test_files = [
     "spec/jruby-on-hadoop_spec.rb",
      "spec/ruby_wrapper_spec.rb",
-     "examples/mapred.rb"
+     "examples/wordcount.rb"
   ]
 
   if s.respond_to? :specification_version then
