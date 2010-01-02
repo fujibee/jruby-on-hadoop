@@ -9,10 +9,10 @@
      ====================================================================== -->
 <project name="build JRuby map reduce" default="jar">
 
-    <property environment="env" />
-    <property name="hadoop.home" value="${env.HADOOP_HOME}" />
-    
-	<property name="version" value="0.0.1" />
+	<property environment="env" />
+	<property name="hadoop.home" value="${env.HADOOP_HOME}" />
+
+	<property name="version" value="0.0.2" />
 	<property name="src.dir" value="${basedir}/src/java" />
 	<property name="build.dir" value="${basedir}/build" />
 	<property name="dist.dir" value="${basedir}/dist" />
@@ -20,7 +20,7 @@
 	<property name="hadoop.version" value="0.19.2" />
 	<property name="hadoop.jar" value="${hadoop.home}/hadoop-${hadoop.version}-core.jar" />
 
-	<target name="jar" depends="compile">
+	<target name="jar" depends="clean,compile">
 		<mkdir dir="${dist.dir}" />
 		<jar jarfile="${dist.dir}/hadoop-ruby.jar" basedir="${build.dir}">
 			<manifest>
@@ -33,10 +33,22 @@
 		</jar>
 	</target>
 
-    <target name="compile">
-        <echo message="${hadoop.jar}" />
+	<target name="compile">
+		<echo message="${hadoop.jar}" />
 		<mkdir dir="${build.dir}" />
-        <javac srcdir="${src.dir}" destdir="${build.dir}" classpath="${hadoop.jar}" />
-    </target>
+		<javac srcdir="${src.dir}" destdir="${build.dir}">
+			<classpath>
+				<fileset dir="${hadoop.home}">
+					<include name="*.jar" />
+					<include name="lib/*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
+	</target>
 
 </project>
