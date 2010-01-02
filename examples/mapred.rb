@@ -1,8 +1,8 @@
 # wordcount example
 
-#def setup(conf)
-#  ['test/inputs', 'test/outputs']
-#end
+def setup(conf)
+  ['test/inputs', 'test/outputs']
+end
 
 def map(key, value, output, reporter)
   value.split.each do |word|

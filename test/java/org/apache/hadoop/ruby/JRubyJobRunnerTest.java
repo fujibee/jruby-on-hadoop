@@ -10,7 +10,7 @@ public class JRubyJobRunnerTest {
 		JRubyJobRunner runner = new JRubyJobRunner();
 		Configuration conf = new Configuration();
 		runner.setConf(conf);
-		String[] args = { "--script", "mapred.rb" };
+		String[] args = { "--script", "mapred.rb", "inputs", "outputs" };
 		try {
 			runner.run(args);
 		} catch (Throwable t) { /* ignore */ }

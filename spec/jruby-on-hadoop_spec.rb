@@ -33,7 +33,8 @@ describe JRubyOnHadoop::Client do
   end
 
   it 'gather necessary ruby files' do
-    @client.opt_files.should match /mapred.rb/
+    @client.opt_files.split(",").should include "mapred.rb"
+    @client.opt_files.should match /ruby_wrapper\.rb/
   end
 
   it 'construct command for running hadoop' do
@@ -42,7 +43,15 @@ describe JRubyOnHadoop::Client do
   end
 
   it 'can get mapred args' do
-    client = JRubyOnHadoop::Client.new(["mapred.rb", "inputs", "outputs"])
+    client = JRubyOnHadoop::Client.new(["examples/mapred.rb", "inputs", "outputs"])
     client.mapred_args.should == "--script mapred.rb inputs outputs"
+  end
+
+  it 'can parse args' do
+    client = JRubyOnHadoop::Client.new(["examples/mapred.rb", "in", "out"])
+    client.script.should == 'mapred.rb'
+    client.inputs.should == 'in'
+    client.outputs.should == 'out'
+    client.files.should include 'examples/mapred.rb'
   end
 end

@@ -2,9 +2,11 @@ module JRubyOnHadoop
   JAVA_MAIN_CLASS = 'org.apache.hadoop.ruby.JRubyJobRunner' 
 
   class Client
+    attr_reader :script, :inputs, :outputs, :files
+
     def initialize(args=[])
       @args = args
-      @init_script = args[0] || 'mapred.rb'
+      parse_args
 
       # env check
       hadoop_home = ENV['HADOOP_HOME']
@@ -22,10 +24,18 @@ module JRubyOnHadoop
       " -libjars #{opt_libjars} -files #{opt_files} #{mapred_args}"
     end
 
+    def parse_args
+      script_path = @args.size > 0 ? @args[0] : 'mapred.rb'
+      @script = File.basename(script_path) 
+      @inputs = @args[1] if @args.size == 3
+      @outputs = @args[2] if @args.size == 3
+      @files = [script_path, JRubyOnHadoop.wrapper_ruby_file]
+    end
+
     def mapred_args
-      args = "--script #{@init_script} "
-      @args.shift # no need arg for script
-      args += @args.join(" ") if @args.size > 0
+      args = "--script #{@script} "
+      args += "#{@inputs} " if @inputs
+      args += "#{@outputs}" if @outputs
       args
     end
 
@@ -35,7 +45,7 @@ module JRubyOnHadoop
     end
 
     def opt_files
-      [@init_script, JRubyOnHadoop.wrapper_ruby_file].join(',')
+      @files.join(',')
     end
 
     def main_jar_path

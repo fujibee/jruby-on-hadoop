@@ -1,5 +1,7 @@
 package org.apache.hadoop.ruby;
 
+import javax.script.ScriptException;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -54,15 +56,19 @@ public class JRubyJobRunner extends Configured implements Tool {
 		String[] otherArgs = commandLine.getArgs();
 		if (otherArgs.length >= 2) {
 			FileInputFormat.setInputPaths(conf, otherArgs[0]);
-			FileOutputFormat.setOutputPath(conf, new Path(args[1]));
+			FileOutputFormat.setOutputPath(conf, new Path(otherArgs[1]));
 		}
 
 		// override by Ruby script
 		JRubyEvaluator evaluator = new JRubyEvaluator(conf);
-		Object[] paths = (Object[]) evaluator.invoke("wrap_setup", conf);
-		if (paths != null && paths.length == 2) {
-			FileInputFormat.setInputPaths(conf, (String) paths[0]);
-			FileOutputFormat.setOutputPath(conf, new Path((String) paths[1]));
+		try {
+			Object[] paths = (Object[]) evaluator.invoke("wrap_setup", conf);
+			if (paths != null && paths.length == 2) {
+				FileInputFormat.setInputPaths(conf, (String) paths[0]);
+				FileOutputFormat.setOutputPath(conf, new Path((String) paths[1]));
+			}
+		} catch (ScriptException e) {
+			// do nothing. maybe user script has no "setup" method
 		}
 
 		JobClient.runJob(conf);
