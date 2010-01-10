@@ -1,6 +1,9 @@
 = JRuby on Hadoop
 
 JRuby on Hadoop is a thin wrapper for Hadoop Mapper / Reducer by JRuby.
+We recommend to use this with hadoop-rubydsl on the github / gemcutter.
+
+== Description
 
 == Install
 
@@ -10,7 +13,7 @@ Required gems are all on GemCutter.
 2. Install gems
  $ gem install jruby-on-hadoop
 
-== Description
+== Usage
 
 1. Run Hadoop cluster on your machines and set HADOOP_HOME env variable.
 2. put files into your hdfs. ex) test/inputs/file1
@@ -18,7 +21,8 @@ Required gems are all on GemCutter.
  $ joh examples/wordcount.rb test/inputs test/outputs
 You can get Hadoop job results in your hdfs test/outputs/part-*
 
-Script example. (see also examples/wordcount.rb)
+== Example 
+see also examples/wordcount.rb
 
  def setup(conf)
    # setup jobconf
