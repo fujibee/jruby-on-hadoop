@@ -5,7 +5,7 @@ describe 'wrapper' do
     examples_dir = File.expand_path(File.join(File.dirname(__FILE__), '..', 'examples'))
     $: << examples_dir
 
-    @script = 'mapred.rb'
+    @script = 'wordcount.rb'
     @output, @repoter = mock('output'), mock('repoter') 
 
     @key, @value = Text.new, Text.new
