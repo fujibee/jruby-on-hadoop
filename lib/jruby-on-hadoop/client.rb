@@ -9,10 +9,21 @@ module JRubyOnHadoop
       parse_args
 
       # env check
-      hadoop_home = ENV['HADOOP_HOME']
-      raise 'HADOOP_HOME is not set' unless hadoop_home 
-      @hadoop_cmd = "#{hadoop_home}/bin/hadoop"
+      hadoop_home and hadoop_cmd
       ENV['HADOOP_CLASSPATH'] = "#{lib_path}:#{File.dirname(@script_path)}"
+    end
+
+    def hadoop_home
+      home = ENV['HADOOP_HOME']
+      raise 'HADOOP_HOME is not set' if home.nil? or home.empty?
+      home
+    end
+
+    def hadoop_cmd
+      hadoop = `which hadoop 2>/dev/null`
+      hadoop = "#{hadoop_home}/bin/hadoop" if hadoop.nil? or hadoop.empty?
+      raise 'cannot find hadoop command' unless hadoop
+      hadoop.chomp
     end
 
     def run
@@ -20,7 +31,7 @@ module JRubyOnHadoop
     end
 
     def cmd
-      "#{@hadoop_cmd} jar #{main_jar_path} #{JAVA_MAIN_CLASS}" +
+      "#{hadoop_cmd} jar #{main_jar_path} #{JAVA_MAIN_CLASS}" +
       " -libjars #{opt_libjars} -files #{opt_files} #{mapred_args}"
     end
 

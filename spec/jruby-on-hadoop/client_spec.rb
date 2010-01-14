@@ -35,4 +35,45 @@ describe JRubyOnHadoop::Client do
     client.outputs.should == 'out'
     client.files.should include 'examples/mapred.rb'
   end
+
+  it 'should raise error if HADOOP_HOME env is not set' do
+    saved = ENV['HADOOP_HOME']
+    ENV['HADOOP_HOME'] = ''
+    begin
+      lambda { JRubyOnHadoop::Client.new }.should raise_error
+    ensure
+      ENV['HADOOP_HOME'] = saved
+    end
+  end
+
+  it 'can determin bin/hadoop path' do
+    @client.hadoop_cmd.should match /hadoop$/
+  end
+
+  it 'can determin bin/hadoop path if even no in PATH env var' do
+    saved = ENV['PATH']
+    begin
+      ENV['PATH'] = ''
+      ENV['HADOOP_HOME'].should_not be_empty
+      client = JRubyOnHadoop::Client.new
+      client.hadoop_cmd.should match ENV['HADOOP_HOME']
+      client.hadoop_cmd.should match /hadoop$/
+    ensure
+      ENV['PATH'] = saved
+    end
+  end
+
+  it 'should raise error if cannot determin bin/hadoop path' do
+    saved_path = ENV['PATH']
+    saved_home = ENV['HADOOP_HOME']
+    begin
+      ENV['PATH'] = ''
+      lambda { JRubyOnHadoop::Client.new }.should_not raise_error
+      ENV['HADOOP_HOME'] = ''
+      lambda { JRubyOnHadoop::Client.new }.should raise_error
+    ensure
+      ENV['PATH'] = saved_path
+      ENV['HADOOP_HOME'] = saved_home
+    end
+  end
 end
