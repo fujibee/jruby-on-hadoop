@@ -76,4 +76,10 @@ describe JRubyOnHadoop::Client do
       ENV['HADOOP_HOME'] = saved_home
     end
   end
+
+  it 'set HADOOP_CLASSPATH env var' do
+      client = JRubyOnHadoop::Client.new
+      client.hadoop_classpath.should match JRubyJars.core_jar_path
+      client.hadoop_classpath.should match JRubyJars.stdlib_jar_path
+  end
 end

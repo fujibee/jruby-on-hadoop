@@ -8,9 +8,8 @@ module JRubyOnHadoop
       @args = args
       parse_args
 
-      # env check
-      hadoop_home and hadoop_cmd
-      ENV['HADOOP_CLASSPATH'] = "#{lib_path}:#{File.dirname(@script_path)}"
+      # env get / set and check
+      hadoop_home and hadoop_cmd and hadoop_classpath
     end
 
     def hadoop_home
@@ -24,6 +23,11 @@ module JRubyOnHadoop
       hadoop = "#{hadoop_home}/bin/hadoop" if hadoop.nil? or hadoop.empty?
       raise 'cannot find hadoop command' unless hadoop
       hadoop.chomp
+    end
+
+    def hadoop_classpath
+      ENV['HADOOP_CLASSPATH'] =
+        ([lib_path, File.dirname(@script_path)] + jruby_jars).join(':')
     end
 
     def run
@@ -50,21 +54,13 @@ module JRubyOnHadoop
       args
     end
 
-    def opt_libjars
-      # jruby jars
-      [JRubyJars.core_jar_path, JRubyJars.stdlib_jar_path].join(',')
+    def jruby_jars
+      [JRubyJars.core_jar_path, JRubyJars.stdlib_jar_path]
     end
 
-    def opt_files
-      @files.join(',')
-    end
-
-    def main_jar_path
-      JRubyOnHadoop.jar_path
-    end
-
-    def lib_path
-      JRubyOnHadoop.lib_path
-    end
+    def opt_libjars; jruby_jars.join(',') end
+    def opt_files; @files.join(',') end
+    def main_jar_path; JRubyOnHadoop.jar_path end
+    def lib_path; JRubyOnHadoop.lib_path end
   end
 end

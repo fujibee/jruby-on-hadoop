@@ -27,7 +27,7 @@ public class JRubyEvaluator {
 	public JRubyEvaluator(JobConf conf) {
 		rubyEngine = new ScriptEngineManager().getEngineByName("jruby");
 		if (rubyEngine == null)
-			new RuntimeException("cannot get jruby engine");
+			throw new RuntimeException("cannot find jruby engine");
 		scriptFileName = conf.get("mapred.ruby.script");
 		dslFileName = conf.get("mapred.ruby.dslfile");
 	}
