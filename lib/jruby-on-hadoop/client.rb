@@ -13,15 +13,13 @@ module JRubyOnHadoop
     end
 
     def hadoop_home
-      home = ENV['HADOOP_HOME']
-      raise 'HADOOP_HOME is not set' if home.nil? or home.empty?
-      home
+      ENV['HADOOP_HOME']
     end
 
     def hadoop_cmd
       hadoop = `which hadoop 2>/dev/null`
-      hadoop = "#{hadoop_home}/bin/hadoop" if hadoop.nil? or hadoop.empty?
-      raise 'cannot find hadoop command' unless hadoop
+      hadoop = "#{hadoop_home}/bin/hadoop" if hadoop.empty? and (!hadoop_home.empty?)
+      raise 'cannot find hadoop command' if hadoop.empty?
       hadoop.chomp
     end
 

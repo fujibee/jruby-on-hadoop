@@ -36,11 +36,11 @@ describe JRubyOnHadoop::Client do
     client.files.should include 'examples/mapred.rb'
   end
 
-  it 'should raise error if HADOOP_HOME env is not set' do
+  it 'should not raise error if HADOOP_HOME env is not set' do
     saved = ENV['HADOOP_HOME']
     ENV['HADOOP_HOME'] = ''
     begin
-      lambda { JRubyOnHadoop::Client.new }.should raise_error
+      lambda { JRubyOnHadoop::Client.new }.should_not raise_error
     ensure
       ENV['HADOOP_HOME'] = saved
     end
