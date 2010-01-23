@@ -30,16 +30,19 @@ public class JRubyEvaluator {
 			throw new RuntimeException("cannot find jruby engine");
 		scriptFileName = conf.get("mapred.ruby.script");
 		dslFileName = conf.get("mapred.ruby.dslfile");
+		try {
+			// evaluate ruby library upfront
+			rubyEngine.eval(readRubyWrapperFile());
+		} catch (Exception e) {
+			throw new RuntimeException("cannot find wrapper file", e);
+		}
 	}
 
 	public Object invoke(String methodName, Object conf) throws ScriptException {
 		Object result = null;
 		try {
-			rubyEngine.eval(readRubyWrapperFile());
 			result = ((Invocable) rubyEngine).invokeFunction(methodName, conf,
 					scriptFileName, dslFileName);
-		} catch (FileNotFoundException e) {
-			throw new ScriptException(e);
 		} catch (NoSuchMethodException e) {
 			throw new ScriptException(e);
 		}
@@ -50,11 +53,8 @@ public class JRubyEvaluator {
 			Object output, Object reporter) throws ScriptException {
 		Object result = null;
 		try {
-			rubyEngine.eval(readRubyWrapperFile());
 			result = ((Invocable) rubyEngine).invokeFunction(methodName, key,
 					value, output, reporter, scriptFileName, dslFileName);
-		} catch (FileNotFoundException e) {
-			throw new ScriptException(e);
 		} catch (NoSuchMethodException e) {
 			throw new ScriptException(e);
 		}
