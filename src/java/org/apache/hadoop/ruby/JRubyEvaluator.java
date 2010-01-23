@@ -5,18 +5,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.apache.hadoop.mapred.JobConf;
+import org.jruby.embed.ScriptingContainer;
 
 public class JRubyEvaluator {
 
 	private static final String WRAPPER_FILE_NAME = "ruby_wrapper.rb";
 
-	private ScriptEngine rubyEngine;
+	private ScriptingContainer rubyEngine;
 
 	/** ruby script name kicked by Java at first */
 	private String scriptFileName;
@@ -25,39 +23,32 @@ public class JRubyEvaluator {
 	private String dslFileName;
 
 	public JRubyEvaluator(JobConf conf) {
-		rubyEngine = new ScriptEngineManager().getEngineByName("jruby");
+		rubyEngine = new ScriptingContainer();
 		if (rubyEngine == null)
 			throw new RuntimeException("cannot find jruby engine");
 		scriptFileName = conf.get("mapred.ruby.script");
 		dslFileName = conf.get("mapred.ruby.dslfile");
 		try {
 			// evaluate ruby library upfront
-			rubyEngine.eval(readRubyWrapperFile());
+			rubyEngine.runScriptlet(readRubyWrapperFile(), WRAPPER_FILE_NAME);
 		} catch (Exception e) {
 			throw new RuntimeException("cannot find wrapper file", e);
 		}
 	}
 
 	public Object invoke(String methodName, Object conf) throws ScriptException {
-		Object result = null;
-		try {
-			result = ((Invocable) rubyEngine).invokeFunction(methodName, conf,
-					scriptFileName, dslFileName);
-		} catch (NoSuchMethodException e) {
-			throw new ScriptException(e);
-		}
+		Object self = rubyEngine.get("self");
+		Object result = rubyEngine.callMethod(self, methodName, new Object[] {
+				conf, scriptFileName, dslFileName }, Object[].class);
 		return result;
 	}
 
 	public Object invoke(String methodName, Object key, Object value,
 			Object output, Object reporter) throws ScriptException {
-		Object result = null;
-		try {
-			result = ((Invocable) rubyEngine).invokeFunction(methodName, key,
-					value, output, reporter, scriptFileName, dslFileName);
-		} catch (NoSuchMethodException e) {
-			throw new ScriptException(e);
-		}
+		Object self = rubyEngine.get("self");
+		Object result = rubyEngine.callMethod(self, methodName, new Object[] {
+				key, value, output, reporter, scriptFileName, dslFileName },
+				null);
 		return result;
 	}
 

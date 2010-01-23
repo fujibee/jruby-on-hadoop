@@ -11,6 +11,7 @@
 
 	<property environment="env" />
 	<property name="hadoop.home" value="${env.HADOOP_HOME}" />
+	<property name="jruby.home" value="${env.JRUBY_HOME}" />
 
 	<property name="version" value="0.0.2" />
 	<property name="src.dir" value="${basedir}/src/java" />
@@ -19,6 +20,8 @@
 
 	<property name="hadoop.version" value="0.19.2" />
 	<property name="hadoop.jar" value="${hadoop.home}/hadoop-${hadoop.version}-core.jar" />
+	
+	<property name="jruby.jar" value="jruby.jar" />
 
 	<target name="jar" depends="clean,compile">
 		<mkdir dir="${dist.dir}" />
@@ -41,6 +44,9 @@
 				<fileset dir="${hadoop.home}">
 					<include name="*.jar" />
 					<include name="lib/*.jar" />
+				</fileset>
+				<fileset dir="${jruby.home}">
+					<include name="lib/${jruby.jar}" />
 				</fileset>
 			</classpath>
 		</javac>
