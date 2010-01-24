@@ -24,6 +24,8 @@ public class JRubyMapper extends JRubyMapRed implements
 			evaluator.invoke("wrap_map", key, value, output, reporter);
 		} catch (ScriptException e) {
 			reporter.setStatus(e.getMessage());
+		} finally {
+			evaluator.checkResource();
 		}
 	}
 }

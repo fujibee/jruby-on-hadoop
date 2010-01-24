@@ -8,11 +8,17 @@ import java.io.Reader;
 import javax.script.ScriptException;
 
 import org.apache.hadoop.mapred.JobConf;
+import org.jruby.embed.LocalContextScope;
 import org.jruby.embed.ScriptingContainer;
 
 public class JRubyEvaluator {
 
 	private static final String WRAPPER_FILE_NAME = "ruby_wrapper.rb";
+
+	/** invoke count is limited so that memory leaking */
+	private static final int INVOKE_LIMIT = 10000;
+
+	private static int invokeCounter = 0;
 
 	private ScriptingContainer rubyEngine;
 
@@ -23,33 +29,50 @@ public class JRubyEvaluator {
 	private String dslFileName;
 
 	public JRubyEvaluator(JobConf conf) {
-		rubyEngine = new ScriptingContainer();
-		if (rubyEngine == null)
-			throw new RuntimeException("cannot find jruby engine");
 		scriptFileName = conf.get("mapred.ruby.script");
 		dslFileName = conf.get("mapred.ruby.dslfile");
+
+		setupEngine();
+	}
+
+	public Object invoke(String methodName, Object conf) throws ScriptException {
+		Object self = null; // if receiver is null, should use toplevel.
+		Object result = rubyEngine.callMethod(self, methodName, new Object[] {
+				conf, scriptFileName, dslFileName }, Object[].class);
+		invokeCounter++;
+		return result;
+	}
+
+	public Object invoke(String methodName, Object key, Object value,
+			Object output, Object reporter) throws ScriptException {
+		Object self = null; // if receiver is null, should use toplevel.
+		Object result = rubyEngine.callMethod(self, methodName, new Object[] {
+				key, value, output, reporter, scriptFileName, dslFileName },
+				null);
+		invokeCounter++;
+		return result;
+	}
+
+	// check resouce and restart engine if over limit
+	public void checkResource() {
+		// now simply count because cannot check directly
+		// ThreadContextMap in ThreadService seems to be leaked
+		if (invokeCounter > INVOKE_LIMIT) {
+			invokeCounter = 0;
+			setupEngine();
+		}
+	}
+
+	private void setupEngine() {
+		rubyEngine = new ScriptingContainer(LocalContextScope.SINGLETHREAD);
+		if (rubyEngine == null)
+			throw new RuntimeException("cannot find jruby engine");
 		try {
 			// evaluate ruby library upfront
 			rubyEngine.runScriptlet(readRubyWrapperFile(), WRAPPER_FILE_NAME);
 		} catch (Exception e) {
 			throw new RuntimeException("cannot find wrapper file", e);
 		}
-	}
-
-	public Object invoke(String methodName, Object conf) throws ScriptException {
-		Object self = rubyEngine.get("self");
-		Object result = rubyEngine.callMethod(self, methodName, new Object[] {
-				conf, scriptFileName, dslFileName }, Object[].class);
-		return result;
-	}
-
-	public Object invoke(String methodName, Object key, Object value,
-			Object output, Object reporter) throws ScriptException {
-		Object self = rubyEngine.get("self");
-		Object result = rubyEngine.callMethod(self, methodName, new Object[] {
-				key, value, output, reporter, scriptFileName, dslFileName },
-				null);
-		return result;
 	}
 
 	private Reader readRubyWrapperFile() throws FileNotFoundException {

@@ -24,6 +24,8 @@ public class JRubyReducer extends JRubyMapRed implements
 			evaluator.invoke("wrap_reduce", key, values, output, reporter);
 		} catch (ScriptException e) {
 			reporter.setStatus(e.getMessage());
+		} finally {
+			evaluator.checkResource();
 		}
 	}
 }
