@@ -1,7 +1,7 @@
 = JRuby on Hadoop
 
 JRuby on Hadoop is a thin wrapper for Hadoop Mapper / Reducer by JRuby.
-We recommend to use this with hadoop-rubydsl on the github / gemcutter.
+We recommend to use this with hadoop-papyrus on the github / gemcutter.
 
 == Description
 
