@@ -8,6 +8,7 @@ import java.io.Reader;
 import javax.script.ScriptException;
 
 import org.apache.hadoop.mapred.JobConf;
+import org.jruby.RubyInstanceConfig.CompileMode;
 import org.jruby.embed.LocalContextScope;
 import org.jruby.embed.ScriptingContainer;
 
@@ -65,6 +66,8 @@ public class JRubyEvaluator {
 
 	private void setupEngine() {
 		rubyEngine = new ScriptingContainer(LocalContextScope.SINGLETHREAD);
+		rubyEngine.getProvider().getRubyInstanceConfig().setCompileMode(
+				CompileMode.JIT);
 		if (rubyEngine == null)
 			throw new RuntimeException("cannot find jruby engine");
 		try {
